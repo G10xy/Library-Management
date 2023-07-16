@@ -1,10 +1,11 @@
-package it.gioxi.statemachine;
+package it.gioxi.statemachine.model;
 
-import lombok.Builder;
+import it.gioxi.statemachine.model.enums.BookStates;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 
-@Builder
+@AllArgsConstructor
 @Data
 public class BookResponse {
 

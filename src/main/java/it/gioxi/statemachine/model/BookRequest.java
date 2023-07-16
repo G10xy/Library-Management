@@ -1,4 +1,4 @@
-package it.gioxi.statemachine;
+package it.gioxi.statemachine.model;
 
 import lombok.Data;
 

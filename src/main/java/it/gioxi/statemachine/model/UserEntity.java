@@ -1,4 +1,4 @@
-package it.gioxi.statemachine;
+package it.gioxi.statemachine.model;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -13,7 +13,7 @@ import java.util.Set;
 @NoArgsConstructor
 @Entity
 @Table(name = "users")
-public class User {
+public class UserEntity {
 
     @Id
     @GeneratedValue
@@ -26,5 +26,5 @@ public class User {
     private String email;
 
     @ManyToMany(mappedBy = "usersWhoBorrowed")
-    private Set<Book> borrowedBooks = new HashSet<>();
+    private Set<BookEntity> borrowedBookEntities = new HashSet<>();
 }

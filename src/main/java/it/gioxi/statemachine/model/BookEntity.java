@@ -1,5 +1,6 @@
-package it.gioxi.statemachine;
+package it.gioxi.statemachine.model;
 
+import it.gioxi.statemachine.model.enums.BookStates;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -13,7 +14,7 @@ import java.util.Set;
 @NoArgsConstructor
 @Entity
 @Table(name = "books")
-public class Book {
+public class BookEntity {
 
     @Id
     @GeneratedValue
@@ -35,5 +36,5 @@ public class Book {
             name = "borrowing",
             joinColumns = @JoinColumn(name = "book_id"),
             inverseJoinColumns = @JoinColumn(name = "user_id"))
-    private Set<User> usersWhoBorrowed = new HashSet<>();
+    private Set<UserEntity> usersWhoBorrowed = new HashSet<>();
 }
