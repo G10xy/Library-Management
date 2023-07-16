@@ -1,10 +1,18 @@
-package it.gioxi.statemachine;
+package it.gioxi.statemachine.controller;
 
 
+import it.gioxi.statemachine.model.BookRequest;
+import it.gioxi.statemachine.model.BookRequestUpdate;
+import it.gioxi.statemachine.model.BookResponse;
+import it.gioxi.statemachine.model.enums.BookEvents;
+import it.gioxi.statemachine.service.BookService;
+import it.gioxi.statemachine.service.BookStatusChangeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Collection;
 
 @RestController
 @RequiredArgsConstructor
@@ -14,12 +22,17 @@ public class BookController {
     private final BookService bookService;
     private final BookStatusChangeService bookStatusChangeService;
 
+    @GetMapping
+    public ResponseEntity<Collection<BookResponse>> findBooks() {
+        return ResponseEntity.ok(bookService.findAll());
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<BookResponse> findBookById(@PathVariable Long id) {
         return ResponseEntity.ok(bookService.findBookResponseById(id));
     }
 
-    @GetMapping
+    @GetMapping("/by-title")
     public ResponseEntity<BookResponse> findBookByTitle(@RequestParam String title) {
         return ResponseEntity.ok(bookService.findBookResponseByTitle(title));
     }
@@ -31,7 +44,7 @@ public class BookController {
     }
 
     @PostMapping
-    public ResponseEntity<HttpStatus> newBook(@RequestBody BookRequest newBook) {
+    public ResponseEntity<HttpStatus> createBook(@RequestBody BookRequest newBook) {
         bookService.save(newBook);
         return ResponseEntity.ok(HttpStatus.CREATED);
     }
@@ -48,9 +61,15 @@ public class BookController {
         return ResponseEntity.ok("Book returned");
     }
 
-    @PatchMapping("/{id}/markoverdue")
+    @PatchMapping("/{id}/mark-overdue")
     public ResponseEntity<String> markOverdue(@PathVariable Long id) throws Exception {
         bookStatusChangeService.doAction(id, BookEvents.MARK_OVERDUE);
         return ResponseEntity.ok("Book marked as overdue");
+    }
+
+    @PatchMapping("/{id}/mark-issued")
+    public ResponseEntity<String> markIssued(@PathVariable Long id) throws Exception {
+        bookStatusChangeService.doAction(id, BookEvents.ISSUE_BOOK);
+        return ResponseEntity.ok("Book marked as issued");
     }
 }
