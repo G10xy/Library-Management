@@ -1,21 +1,32 @@
-package it.gioxi.statemachine;
+package it.gioxi.statemachine.service;
 
+import it.gioxi.statemachine.repository.BookRepository;
+import it.gioxi.statemachine.model.BookEntity;
+import it.gioxi.statemachine.model.BookRequest;
+import it.gioxi.statemachine.model.BookRequestUpdate;
+
+import it.gioxi.statemachine.model.BookResponse;
+import it.gioxi.statemachine.model.enums.BookStates;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collection;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class BookService {
     private final BookRepository bookRepository;
 
-    public Book findById(Long id) {
+    public Collection<BookResponse> findAll() { return bookRepository.findAll().stream().map(x -> new BookResponse(x.getId(), x.getTitle(), x.getState())).collect(Collectors.toList()); }
+
+    public BookEntity findById(Long id) {
         return bookRepository.findById(id).orElseThrow();
     }
 
-    public Optional<Book>  findByTitle(String title) {
+    public Optional<BookEntity>  findByTitle(String title) {
         return bookRepository.findByTitleContainingIgnoreCase(title);
     }
 
@@ -42,7 +53,7 @@ public class BookService {
 
     @Transactional
     public void save(BookRequest request) {
-        var newBook = new Book();
+        var newBook = new BookEntity();
         newBook.setState(BookStates.AVAILABLE);
         newBook.setTitle(request.getTitle());
         bookRepository.save(newBook);
