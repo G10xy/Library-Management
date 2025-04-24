@@ -1,11 +1,14 @@
 package it.gioxi.statemachine.statemachine;
 
+import it.gioxi.statemachine.event.BookReturnedEvent;
+import it.gioxi.statemachine.model.BookEntity;
 import it.gioxi.statemachine.service.BookService;
 import it.gioxi.statemachine.model.UserEntity;
 import it.gioxi.statemachine.model.enums.BookEvents;
 import it.gioxi.statemachine.model.enums.BookStates;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.Message;
@@ -34,6 +37,7 @@ public class StateMachineConfig extends StateMachineConfigurerAdapter<BookStates
 
     private final BookService bookService;
     private final InMemoryStateMachinePersist persister;
+    private final ApplicationEventPublisher applicationEventPublisher;
 
     @Override
     public void configure(StateMachineStateConfigurer<BookStates, BookEvents> states) throws Exception {
@@ -122,9 +126,11 @@ public class StateMachineConfig extends StateMachineConfigurerAdapter<BookStates
         return context -> {
             Long bookId = context.getMessageHeaders().get("bookId", Long.class);
             if (bookId != null) {
-                Set<UserEntity> usersWhoBorrowed = bookService.findById(bookId).getUsersWhoBorrowed();
-                for (var user : usersWhoBorrowed) {
-                    // code to send email to the user
+                BookEntity book = bookService.findById(bookId);
+                Set<UserEntity> usersWhoBorrowed = book.getUsersWhoBorrowed();
+
+                for (UserEntity user : usersWhoBorrowed) {
+                    applicationEventPublisher.publishEvent(new BookReturnedEvent(this, book, user));
                 }
             }
         };
